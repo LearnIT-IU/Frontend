@@ -1,3 +1,4 @@
+import json
 import streamlit as st
 
 # Set page configuration
@@ -55,22 +56,38 @@ COMMONWEALTH_STYLE = """
 # Embed the style
 st.markdown(COMMONWEALTH_STYLE, unsafe_allow_html=True)
 
-# Login Container
-st.markdown('<div class="login-container">', unsafe_allow_html=True)
+# Load demo credentials from config.json
+def load_credentials():
+    with open('config.json') as f:
+        return json.load(f)["users"]
+    
+# Authenticate user by email and password
+def authenticate(email, password):
+    user = load_credentials()
+    for user in user:
+        if user['email'] == email and user['password'] == password:
+            return True
+        return False
+
+# Iniitialize session state for login
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+# Redirect to main page if logged in
+if st.session_state.logged_in:
+    st.experimental_rerun()
 
 # Login Form
 st.markdown("<h2>Login</h2>", unsafe_allow_html=True)
-email = st.text_input("E-Mail", placeholder="Enter your E-Mail")
+email = st.text_input("Email", placeholder="Enter your email")
 password = st.text_input("Password", type="password", placeholder="Enter your password")
 login_button = st.button("Login")
 
-# Check login
+# Handle login
 if login_button:
-    if email == "admin" and password == "password":
-        st.success("Login successful!")
-        st.balloons()
+    if authenticate(email, password):
+        st.success
+        st.write
+        st.experimental_rerun()
     else:
-        st.error("Invalid username or password!")
-
-# Close login container
-st.markdown('</div>', unsafe_allow_html=True)
+        st.error("Invalid email or password")
